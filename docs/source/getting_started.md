@@ -19,7 +19,7 @@ To allow expanding macros, a `# __use_macros__(module_names)` must be placed at 
 Example:
 
 (hello.py)
-```py
+```
 # __use_macros__('rust_macro.builtins')
 
 print(stringify!(Hello, World))
@@ -28,7 +28,7 @@ print(stringify!(Hello, World))
 To run this file, you have 2 options. You can run this file with `python3 -m rust_macro hello.py` or you can do the following:
 
 (main.py)
-```py
+```
 from rust_macro import ExpandMacros
 
 with ExpandMacros():
@@ -45,7 +45,7 @@ When a `str` is returned, that string is then tokenized.
 To be able to export macros, define a variable named `__macros__` in the module that contains a mapping of names to a callable.
 
 Example:
-```py
+```
 from rust_macro.util import Token
 from typing import List
 
