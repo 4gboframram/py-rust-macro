@@ -10,7 +10,7 @@ Welcome to Rust Macro's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-    getting_started
+   getting_started
 
 
 Indices and tables
