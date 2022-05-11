@@ -10,3 +10,5 @@ jobs:
         with:
           black_args: "rust_macro"
           fail_on_error: false
+          exclude: examples
+          
