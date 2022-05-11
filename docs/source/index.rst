@@ -7,10 +7,9 @@ Welcome to Rust Macro's documentation!
 ======================================
 
 .. toctree::
-    getting_started.md
    :maxdepth: 2
    :caption: Contents:
-
+    getting_started
 
 
 Indices and tables
