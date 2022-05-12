@@ -5,18 +5,21 @@ from typing import List, Iterable
 
 
 class MacroError(Exception):
-    def __init__(self, msg):
+    """
+    An Exception to be raised by macros
+    """
+    def __init__(self, msg: str):
         super().__init__(msg)
 
 
 def splitargs(
-    tokens: Iterable[Token], delimiter: str = ","
-) -> List[List[Token]]:  # typehinting is a bit broken
+    tokens: Iterable[Token], *, delimiter: str = ","
+) -> List[List[Token]]:
     """
-    Splits a token stream into its args, separated by a delimiter
+    Splits a token stream into parts by a delimiter string
     """
     return [
-        list(y)
+        list(i for i in y if i.string)
         for x, y in itertools.groupby(tokens, lambda z: z.string == delimiter)
         if not x
     ]

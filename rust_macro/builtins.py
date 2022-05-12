@@ -60,7 +60,7 @@ def platform_mac(tokens: Iterable[Token]) -> Union[str, Iterable[Token]]:
 
 def python_impl(tokens: Iterable[Token]) -> Union[str, Iterable[Token]]:
     """
-    If platform.python_implementation equals specified string, return the code. Otherwise, deletes the code.
+    If platform.python_implementation() matches specified string, return the code. Otherwise, deletes the code.
 
     Example:
         python_impl!("pypy", print("pypy"))
@@ -92,7 +92,7 @@ def py_gte(tokens: Iterable[Token]) -> Union[str, Iterable[Token]]:
     parts = string.split(",")
     if len(parts) <= 1:
         raise MacroError(
-            "platform!() expected a string literal and code separated by a comma"
+            "py_gte!() expected a string literal and code separated by a comma"
         )
 
     version_string = literal_eval(parts[0])
@@ -107,7 +107,7 @@ def py_gte(tokens: Iterable[Token]) -> Union[str, Iterable[Token]]:
 
 def compile_error(tokens: Iterable[Token]) -> NoReturn:
     """
-    raises a compile error
+    raises a compile error upon expanding. probably not useful.
     """
     if len(tokens) != 1 and tokens[0].type != tokenize.STRING:
         raise MacroError("compile_error!() expected a single string literal")

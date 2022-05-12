@@ -12,9 +12,10 @@ Welcome to Rust Macro's documentation!
    :includehidden:
 
    getting_started
+   how_it_works
+   reference
 
-
-Indices and tables
+Util
 ==================
 
 * :ref:`genindex`

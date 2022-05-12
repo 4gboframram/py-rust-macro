@@ -18,17 +18,25 @@ class MacroFindError(Exception):
         super().__init__(msg)
 
 
+class MacroNotFoundError(NameError):
+    """
+    An Exception that is raised when a macro cannot be found in the current scope.
+    """
+    def __init__(self, name: str):
+        super().__init__(f'Macro {name!r} is not defined in the current scope!')
+
+
 class ExpandMacros:
     """
     A context manager that allows expanding macros when importing a module.
     """
 
     def __init__(self, extension=(".py",)):
-        self.path_hook = FileFinder.path_hook((MacroExpander, extension))
+        self._path_hook = FileFinder.path_hook((MacroExpander, extension))
 
     def __enter__(self):
 
-        sys.path_hooks.insert(0, self.path_hook)
+        sys.path_hooks.insert(0, self._path_hook)
         # clear any loaders that might already be in use by the FileFinder
         sys.path_importer_cache.clear()
         importlib.invalidate_caches()
@@ -36,12 +44,12 @@ class ExpandMacros:
         return self
 
     def __exit__(self, *args):
-        sys.path_hooks = [i for i in sys.path_hooks if i is not self.path_hook]
+        sys.path_hooks = [i for i in sys.path_hooks if i is not self._path_hook]
 
 
 class MacroExpander(SourceLoader):
     """
-    The class responsible for expanding macros contained in a module. This class should not be instantiated directly and should only be used through ExpandMacros
+    The class responsible for expanding macros contained in a module. This class should not be instantiated directly and should only be used through ExpandMacros.
     """
 
     def __init__(self, fullname, path):
@@ -57,13 +65,11 @@ class MacroExpander(SourceLoader):
 
         try:
             macros = module.__macros__
-
+            self.macros.update(macros)
         except AttributeError as e:
             raise MacroFindError(
                 f"Module {fullname!r} does not define any macros! Make sure __macros__ is set to a mapping of names to callables."
             ) from e
-
-        self.macros.update(macros)
 
     def get_filename(self, fullname):
         return self.path
@@ -82,7 +88,8 @@ class MacroExpander(SourceLoader):
 
                 if previous_tok.type == _tokenize.NAME:
 
-                    assert previous_tok.string in self.macros
+                    if not previous_tok.string in self.macros:
+                        raise MacroNotFoundError(previous_tok.string)
 
                     i += 1
                     level = 0
@@ -112,7 +119,7 @@ class MacroExpander(SourceLoader):
             i += 1
         return untokenize(tokens)
 
-    def get_data(self, filename: str):
+    def get_data(self, filename: str) -> str:
         """Creates source code for the module"""
         with open(filename) as f:
             data = f.read()
