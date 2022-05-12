@@ -7,7 +7,9 @@ Welcome to Rust Macro's documentation!
 ======================================
 
 .. toctree::
-   :maxdepth: 1
+   :caption: Contents
+   :maxdepth: 2
+   :includehidden:
 
    getting_started
 
