@@ -47,7 +47,7 @@ print(stringify!(Hello, World))
 To run this file, there are 2 options. It can be run with `python3 -m rust_macro hello.py` or you can create another file to import the module from like so:
 
 
-```
+```{code-block} default
 ---
 lineno-start: 1
 caption: |
@@ -63,7 +63,7 @@ with ExpandMacros():
 Then you can simply run this main file by running `python3 main.py`
 
 ```{note}
-The commandline utility approach sets the module's name to __main__ so that scripts can work properly. 
+The commandline utility approach sets the module's name to `__main__` so that scripts can work properly. 
 ```
 
 Both approaches are equally valid and usable, but the direct import approach is more embedable
