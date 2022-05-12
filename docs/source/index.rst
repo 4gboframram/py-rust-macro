@@ -7,7 +7,7 @@ Welcome to Rust Macro's documentation!
 ======================================
 
 .. toctree::
-   :caption: Contents
+   :caption: Library
    :maxdepth: 2
    :includehidden:
 
@@ -20,4 +20,4 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-* :ref:`getting_started`
+
