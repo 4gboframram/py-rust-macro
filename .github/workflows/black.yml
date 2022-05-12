@@ -8,7 +8,5 @@ jobs:
       - uses: actions/checkout@v2
       - uses: rickstaa/action-black@v1
         with:
-          black_args: "rust_macro"
+          black_args: "--exclude '/examples/' ."
           fail_on_error: false
-          exclude: examples
-          
