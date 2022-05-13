@@ -4,4 +4,7 @@
 # python -m rust_macro hello.py
 
 if __name__ == '__main__':
-    print(stringify!(Hello, World))
+    print(stringify!(Hello from the main script!))
+
+print(stringify!(Hello, World))
+    

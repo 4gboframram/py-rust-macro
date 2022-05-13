@@ -8,13 +8,12 @@ class MacroError(Exception):
     """
     An Exception to be raised by macros
     """
+
     def __init__(self, msg: str):
         super().__init__(msg)
 
 
-def splitargs(
-    tokens: Iterable[Token], *, delimiter: str = ","
-) -> List[List[Token]]:
+def splitargs(tokens: Iterable[Token], *, delimiter: str = ",") -> List[List[Token]]:
     """
     Splits a token stream into parts by a delimiter string
     """

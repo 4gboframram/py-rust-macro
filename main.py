@@ -1,9 +1,11 @@
-from rust_macro.util import tokenize_string, splitargs
+from rust_macro import ExpandMacros
+import traceback
 
-tokens = tokenize_string("'Hello, World', Hello There")
 
-args = splitargs(tokens, delimiter=',')
+with ExpandMacros():
 
-assert len(args) == 2
-assert args[0][0].string == "'Hello, World'"
-assert [i.string for i in args[1]] == ['Hello', 'There']
+    try:
+        open("main.py").read()
+
+    except Exception as e:
+        print(traceback.format_exc())

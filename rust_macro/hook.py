@@ -1,3 +1,15 @@
+try:
+    import _bootlocale
+
+    _bootlocale  # pyflakes
+
+    # fix for
+    # AttributeError: module '_bootlocale' has no attribute 'getpreferredencoding'
+    # on pypy3.7 when calling open with the import hook active
+except ImportError:
+    pass
+
+
 import sys
 import importlib
 from importlib.abc import SourceLoader
@@ -22,8 +34,9 @@ class MacroNotFoundError(NameError):
     """
     An Exception that is raised when a macro cannot be found in the current scope.
     """
+
     def __init__(self, name: str):
-        super().__init__(f'Macro {name!r} is not defined in the current scope!')
+        super().__init__(f"Macro {name!r} is not defined in the current scope!")
 
 
 class ExpandMacros:
