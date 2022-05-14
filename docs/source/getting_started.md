@@ -89,10 +89,6 @@ def macro(tokens: List[Token]) -> str:
 __macros__ = {'macro': macro}
 ```
 
-```{warning}
-A macro call is not allowed to expand to another macro call
-```
-
 This file can then be used in an `# __use_macros__` statement and gives access to a macro named `macro`
 
 ## Where to go Next?

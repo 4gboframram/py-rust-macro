@@ -76,7 +76,7 @@ rust_macro.util
 
 .. function:: untokenize(tokens: Iterable[Token]) -> str
 
-    Converts on interable of Tokens back into a string.
+    Converts an interable of Tokens back into a string.
 
 
 .. function:: tokenize_string(s: str) -> List[Token]:

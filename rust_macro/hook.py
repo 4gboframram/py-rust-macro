@@ -17,8 +17,9 @@ from importlib.machinery import SourceFileLoader
 from importlib.machinery import FileFinder
 import tokenize as _tokenize
 import ast
+from typing import MutableSequence
 
-from .util import untokenize, tokenize_string
+from .util import untokenize, MacroError, tokenize_string, Token
 
 
 class MacroFindError(Exception):
@@ -48,7 +49,6 @@ class ExpandMacros:
         self._path_hook = FileFinder.path_hook((MacroExpander, extension))
 
     def __enter__(self):
-
         sys.path_hooks.insert(0, self._path_hook)
         # clear any loaders that might already be in use by the FileFinder
         sys.path_importer_cache.clear()
@@ -87,38 +87,48 @@ class MacroExpander(SourceLoader):
     def get_filename(self, fullname):
         return self.path
 
-    def expand_macros(self, code: str) -> str:
+    def expand_macros(self, tokens: MutableSequence[Token]) -> MutableSequence[Token]:
         """
         Expands the macros in a string based on self.macros
         """
-        tokens = tokenize_string(code)
+        
+        *tokens, = filter(lambda x: x.string, tokens)
 
         i = 0
+        
         while i < len(tokens):
             if tokens[i].string == "!":
                 name_start = i - 1
-                previous_tok = tokens[name_start]
+                while ' ' in tokens[name_start].string:  # ignore potential whitespace error tokens
+                    name_start -= 1
+                
+                name_tok = tokens[name_start]
 
-                if previous_tok.type == _tokenize.NAME:
+                if name_tok.type == _tokenize.NAME:
 
-                    if not previous_tok.string in self.macros:
-                        raise MacroNotFoundError(previous_tok.string)
+                    if not name_tok.string in self.macros:
+                        raise MacroNotFoundError(name_tok.string)
 
                     i += 1
-                    level = 0
+                    
+                    # get the end of the macro call
+                    paren_level = 0
                     first_arg = i + 1
+                    
                     while True:
+                        token = tokens[i]
+                        if token.string == ")":
+                            paren_level -= 1
 
-                        if tokens[i].string == ")":
-                            level -= 1
-
-                        elif tokens[i].string == "(":
-                            level += 1
+                        elif token.string == "(":
+                            paren_level += 1
+                        
                         i += 1
-                        if not level:
+                        
+                        if not paren_level:
                             break
 
-                    macro = self.macros[previous_tok.string]
+                    macro = self.macros[name_tok.string]
                     # macro.__globals__.update(self.locals)
 
                     new_toks = macro(tokens[first_arg : i - 1])
@@ -130,7 +140,24 @@ class MacroExpander(SourceLoader):
                     i = first_arg
 
             i += 1
-        return untokenize(tokens)
+        return tokens
+
+
+    def recursive_expand(self, code: MutableSequence[Token], *, depth_limit: int = 50) -> MutableSequence[Token]:
+        """
+        Recursively expands macros
+        """
+        unexpanded = ''
+        depth = 0
+        while code != unexpanded:
+            unexpanded = code
+            code = self.expand_macros(code)
+            
+            depth += 1
+            if depth > depth_limit:
+                raise MacroError("Macro recursion depth exceeded the limit")
+
+        return untokenize(code)
 
     def get_data(self, filename: str) -> str:
         """Creates source code for the module"""
@@ -147,6 +174,10 @@ class MacroExpander(SourceLoader):
             for file in to_run:
                 self.add_macros(file)
 
-            return self.expand_macros(data)
+            tokens = tokenize_string(data)
+            return self.recursive_expand(tokens)
         else:
             return SourceFileLoader.get_data(self.path, filename)
+
+
+__all__ = ['MacroFindError', 'MacroNotFoundError', 'ExpandMacros', 'MacroExpander']

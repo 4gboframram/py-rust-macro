@@ -5,7 +5,6 @@ rust_macro.hook
 
 .. class:: ExpandMacros()
 
-    :canonical: rust_macro.hook.MacroFindError
 
     The main class that provides a context manager interface to the main import hook.
 
@@ -22,8 +21,6 @@ rust_macro.hook
 
 .. exception:: MacroFindError(msg: str)
 
-    :canonical: rust_macro.hook.MacroFindError
-
     An Exception that is raised when a module does not define macros when another module expects it.
 
     
@@ -31,16 +28,11 @@ rust_macro.hook
     
 .. exception:: MacroNotFoundError(name: str)
 
-    :canonical: rust_macro.hook.MacroNotFoundError
-
     A subclass of ``NameError`` that is raised when a macro cannot be found in the current scope.
 
-    
 
 
 .. class:: MacroExpander(fullname: str, path: str)
-
-    :canonical: rust_macro.hook.MacroExpander
 
     A subclass of ``importlib.abc.SourceLoader`` that is responsible for processing macros in modules and loading processed modules
 
@@ -61,7 +53,7 @@ rust_macro.hook
         The path of the module that ``self`` is responsible for loading
 
     .. attribute:: macros
-       :type: dict[str, Callable[[Iterable[rust_macro.Token]], Union[Iterable[rust_macro.Token], str]]]
+       :type: dict[str, Callable[[Iterable[Token]], Union[Iterable[Token], str]]]
        :value: {}
 
        The mapping of names to macros that ``self`` uses to expand macros
@@ -83,11 +75,19 @@ rust_macro.hook
         :returns: ``self.path``
 
 
-    .. method:: expand_macros(code: str) -> str
+    .. method:: expand_macros(self, tokens: MutableSequence[Token]) -> MutableSequence[Token]
 
-       Tokenizes ``code`` and expands all macros that are in ``self.macros``
+       Expands all registered macros in the token list
 
         :raises MacroNotFoundError: when there is an attempt to expand a macro that isn't defined in the current scope
+
+
+    .. method:: recursive_expand(self, code: MutableSequence[Token], *, depth_limit: int = 50) -> MutableSequence[Token]
+
+        Recursively expands macros that are in the token list.
+
+        :raises MacroNotFoundError: when there is an attempt to expand a macro that isn't defined in the current scope
+        :raises MacroError: when the ``depth_limit`` is exceeded
 
 
     .. method:: get_data(filename: str) -> str
@@ -95,7 +95,8 @@ rust_macro.hook
         Gets the source code for the final processed module.
 
         :param str filename: the file path that is opened
-        
+
+
 
 
     
