@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
         
@@ -31,7 +31,6 @@ jobs:
 
       - name: Install Package
         run: python3 -m pip install .
-        
-      - name: Run tests
-        run: cd ./tests
-      - run: python3 -m unittest
+
+      - name: Run Tests
+        run: python3 -m run_tests.py
