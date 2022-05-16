@@ -91,17 +91,19 @@ class MacroExpander(SourceLoader):
         """
         Expands the macros in a string based on self.macros
         """
-        
-        *tokens, = filter(lambda x: x.string, tokens)
+
+        (*tokens,) = filter(lambda x: x.string, tokens)
 
         i = 0
-        
+
         while i < len(tokens):
             if tokens[i].string == "!":
                 name_start = i - 1
-                while ' ' in tokens[name_start].string:  # ignore potential whitespace error tokens
+                while (
+                    " " in tokens[name_start].string
+                ):  # ignore potential whitespace error tokens
                     name_start -= 1
-                
+
                 name_tok = tokens[name_start]
 
                 if name_tok.type == _tokenize.NAME:
@@ -110,11 +112,11 @@ class MacroExpander(SourceLoader):
                         raise MacroNotFoundError(name_tok.string)
 
                     i += 1
-                    
+
                     # get the end of the macro call
                     paren_level = 0
                     first_arg = i + 1
-                    
+
                     while True:
                         token = tokens[i]
                         if token.string == ")":
@@ -122,9 +124,9 @@ class MacroExpander(SourceLoader):
 
                         elif token.string == "(":
                             paren_level += 1
-                        
+
                         i += 1
-                        
+
                         if not paren_level:
                             break
 
@@ -142,17 +144,18 @@ class MacroExpander(SourceLoader):
             i += 1
         return tokens
 
-
-    def recursive_expand(self, code: MutableSequence[Token], *, depth_limit: int = 50) -> MutableSequence[Token]:
+    def recursive_expand(
+        self, code: MutableSequence[Token], *, depth_limit: int = 50
+    ) -> MutableSequence[Token]:
         """
         Recursively expands macros
         """
-        unexpanded = ''
+        unexpanded = ""
         depth = 0
         while code != unexpanded:
             unexpanded = code
             code = self.expand_macros(code)
-            
+
             depth += 1
             if depth > depth_limit:
                 raise MacroError("Macro recursion depth exceeded the limit")
@@ -180,4 +183,4 @@ class MacroExpander(SourceLoader):
             return SourceFileLoader.get_data(self.path, filename)
 
 
-__all__ = ['MacroFindError', 'MacroNotFoundError', 'ExpandMacros', 'MacroExpander']
+__all__ = ["MacroFindError", "MacroNotFoundError", "ExpandMacros", "MacroExpander"]

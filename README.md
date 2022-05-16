@@ -8,7 +8,7 @@ Why would anyone want macros in Python?
 - Python is a very dynamic language and can be slow at times because of the overhead of calling the same function over and over
 - You might want to add inline parsing of a language like `sql` to remove runtime overhead of parsing a literal
 - Other times you want to call a function before the script is run
-
+- Because why not?
 
 ## Usage
 
