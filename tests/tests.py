@@ -5,8 +5,9 @@ import copy
 import importlib
 from pathlib import Path
 
-
 from rust_macro import hook
+from rust_macro import util
+
 
 def module_from_code(name: str, code: str) -> ModuleType:
     module = ModuleType(name)
@@ -42,7 +43,7 @@ class TestExpandMacro(CleanTest):
             import math
             self.assertEqual(math.gcd(3, 2), 1, "Something is horribly wrong with the math module!") 
 
-        self.assertNotIn(self.expander._path_hook, sys.path_hooks, "cleanup failed")
+        self.assertNotIn(self.expander._path_hook, sys.path_hooks, "cleaning up path hook failed")
 
         self.assertIn('math', sys.modules, "failed to import math module")
 
@@ -61,14 +62,36 @@ class TestMacroExpander(CleanTest):
         loader.add_macros('test_import.test_add_macros')
         with self.expander:
             import test_import.test_add_macros as m
-            self.assertIs(m.__macros__['a_macro'], loader.macros['a_macro'], 'macros were not added correctly')
 
             self.assertEqual(loader.macros, {'a_macro': m.this_is_a_macro}, 'macros were not added correctly')
 
-            self.assert
-            
-            
+
+        loader.add_macros('test_import.test_add_macros2')
+
+        with self.expander:
+            import test_import.test_add_macros2 as mm
+
+            self.assertEqual(loader.macros, {'a_macro': m.this_is_a_macro, 'm': mm.this_is_a_macro}, 'macros were not added correctly')
+
+
+    def test_basic_expand_macros(self):
+        loader = hook.MacroExpander('', '')
+
+        loader.add_macros('rust_macro.builtins')
+
+
+        inp = """
+stringify!(Hello World)
+print(stringify!(Hello World))       
+        """
+        data = [i.string for i in loader.expand_macros(util.tokenize_string(inp)) if i.string]
+
+        s = """
+'Hello World'
+print('Hello World')
+        """
+        expected = [i.string for i in util.tokenize_string(s) if i.string]
         
-        
+        self.assertEqual(data, expected, "macro expansion acts up")
     
             
